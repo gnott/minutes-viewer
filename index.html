@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Minutes Viewer</title>
+	<meta charset="utf-8" />
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	<link rel="stylesheet" href="dist/leaflet.css" />
+	<!--[if lte IE 8]><link rel="stylesheet" href="leaflet.ie.css" /><![endif]-->
+	<style type="text/css">
+	html, body {
+	   height: 100%;
+		 margin: 0;
+	}
+
+	body {
+		width: 300%;
+	}
+
+	#map {
+	   height: 100%;
+	   width: 33.333333333%;
+	   float: left;
+	}
+
+	</style>
+</head>
+<body>
+	<div id="map"></div>
+
+	<script src="dist/leaflet.js"></script>
+	<script src="data/data.js"></script>
+
+	<script>
+
+		var map = L.map('map').setView([48.42824, -123.36327], 13);
+
+		var defaultIcon = L.icon({
+			iconUrl: 'images/marker-icon.png',
+			iconSize: [32, 37],
+			iconAnchor: [16, 37],
+			popupAnchor: [0, -28]
+		});
+
+		function onEachFeature(feature, layer) {
+			var popupContent = "";
+
+			if (feature.properties) {
+				popupContent += feature.properties.title + " # " + feature.properties.id + " for " + feature.properties.address;
+				popupContent += "<br><b>" + feature.properties.date + "</b>";
+				popupContent += "<br>" + '<a href="' + feature.properties.url + '">' + "Link" + "</a>";
+				icon = eval(feature.properties.category + "Icon");
+			}
+			layer.setIcon(icon);
+			layer.bindPopup(popupContent);
+		}
+
+		L.geoJson(varianceCollection, {
+
+			filter: function (feature, layer) {
+				if (feature.properties) {
+					// If the property "underConstruction" exists and is true, return false (don't render features under construction)
+					//if (feature.properties.category)
+					//{
+						//this.icon = eval(feature.properties.category);
+					//}
+					return true;
+				}
+				return false;
+			},
+
+			onEachFeature: onEachFeature
+		}).addTo(map);
+
+		L.tileLayer('http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png', {
+			maxZoom: 18,
+			attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>'
+		}).addTo(map);
+
+		/*
+		 var popup = L.popup();
+
+		function onMapClick(e) {
+			popup
+				.setLatLng(e.latlng)
+				.setContent("You clicked the map at " + e.latlng.toString())
+				.openOn(map);
+		}
+
+		map.on('click', onMapClick);
+		*/
+
+	</script>
+</body>
+</html>
